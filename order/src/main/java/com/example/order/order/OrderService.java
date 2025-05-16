@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +35,18 @@ public class OrderService {
 
         var purchasedProducts = productClient.purchaseProducts(request.products());
 
-        var order = this.repository.save(mapper.toOrder(request));
+        BigDecimal calculatedTotal = purchasedProducts.stream()
+                .map(product -> product.price().multiply(BigDecimal.valueOf(product.quantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        var order = Order.builder()
+                .reference(request.reference())
+                .totalAmount(calculatedTotal)
+                .paymentMethod(request.paymentMethod())
+                .customerId(request.customerId())
+                .build();
+
+        order = this.repository.save(order);
 
         for (PurchaseRequest purchaseRequest : request.products()) {
             orderLineService.saveOrderLine(
@@ -47,7 +59,7 @@ public class OrderService {
             );
         }
         var paymentRequest = new PaymentRequest(
-                request.amount(),
+                calculatedTotal,
                 request.paymentMethod(),
                 order.getId(),
                 order.getReference(),
