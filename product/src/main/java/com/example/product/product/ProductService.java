@@ -38,6 +38,12 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
+    public String getProductPhotoUrl(Integer id) {
+        return repository.findById(id)
+                .map(Product::getPhoto)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found with ID:: " + id));
+    }
+
     @Transactional(rollbackFor = ProductPurchaseException.class)
     public List<ProductPurchaseResponse> purchaseProducts(
             List<ProductPurchaseRequest> request
