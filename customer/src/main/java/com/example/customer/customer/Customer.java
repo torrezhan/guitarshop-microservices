@@ -1,30 +1,27 @@
 package com.example.customer.customer;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 @Builder
-@Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "customers")
 public class Customer {
-
-  @Id
-  @GeneratedValue
-  private Integer id;
-  private String firstname;
-  private String lastname;
-  private String email;
-  private String password;
-  private Address address;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+    private String firstName;
+    private String lastName;
+    @Column(unique = true)
+    private String email;
+    private String password;
+    @Embedded
+    private Address address;
+    private boolean admin;
 }

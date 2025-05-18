@@ -21,7 +21,7 @@ public class CustomerController {
 
   private final CustomerService service;
 
-  @PostMapping
+  @PostMapping("/register")
   public ResponseEntity<String> createCustomer(
       @RequestBody @Valid CustomerRequest request
   ) {
@@ -53,6 +53,13 @@ public class CustomerController {
       @PathVariable("customer-id") String customerId
   ) {
     return ResponseEntity.ok(this.service.findById(customerId));
+  }
+
+  @GetMapping("/email/{email}")
+  public ResponseEntity<CustomerResponse> findByEmail(
+      @PathVariable("email") String email
+  ) {
+    return ResponseEntity.ok(this.service.findByEmail(email));
   }
 
   @DeleteMapping("/{customer-id}")

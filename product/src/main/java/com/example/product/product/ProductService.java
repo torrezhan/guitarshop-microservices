@@ -1,8 +1,10 @@
 package com.example.product.product;
 
 import com.example.product.exception.ProductPurchaseException;
+import com.example.product.exception.UnauthorizedAccessException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,11 @@ public class ProductService {
     public Integer createProduct(
             ProductRequest request
     ) {
+        // Verify admin role
+        if (!hasAdminRole()) {
+            throw new UnauthorizedAccessException("Only administrators can create products");
+        }
+        
         var product = mapper.toProduct(request);
         return repository.save(product).getId();
     }
@@ -73,6 +80,45 @@ public class ProductService {
             purchasedProducts.add(mapper.toproductPurchaseResponse(product, productRequest.quantity()));
         }
         return purchasedProducts;
+    }
+
+    @Transactional
+    public ProductResponse updateProduct(Integer id, ProductRequest request) {
+        // Verify admin role
+        if (!hasAdminRole()) {
+            throw new UnauthorizedAccessException("Only administrators can update products");
+        }
+        
+        var product = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found with ID:: " + id));
+        
+        mapper.updateProductFromRequest(request, product);
+        return mapper.toProductResponse(repository.save(product));
+    }
+
+    @Transactional
+    public void deleteProduct(Integer id) {
+        // Verify admin role
+        if (!hasAdminRole()) {
+            throw new UnauthorizedAccessException("Only administrators can delete products");
+        }
+        
+        if (!repository.existsById(id)) {
+            throw new EntityNotFoundException("Product not found with ID:: " + id);
+        }
+        repository.deleteById(id);
+    }
+
+    public List<ProductResponse> findByCategory(Integer categoryId) {
+        return repository.findByCategoryId(categoryId)
+                .stream()
+                .map(mapper::toProductResponse)
+                .collect(Collectors.toList());
+    }
+    
+    private boolean hasAdminRole() {
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
     }
 
 }

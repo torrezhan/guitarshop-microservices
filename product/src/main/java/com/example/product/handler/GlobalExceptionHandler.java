@@ -1,6 +1,7 @@
 package com.example.product.handler;
 
 import com.example.product.exception.ProductPurchaseException;
+import com.example.product.exception.UnauthorizedAccessException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -19,6 +21,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handle(ProductPurchaseException exp) {
         return ResponseEntity
                 .status(BAD_REQUEST)
+                .body(exp.getMessage());
+    }
+
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<String> handle(UnauthorizedAccessException exp) {
+        return ResponseEntity
+                .status(FORBIDDEN)
                 .body(exp.getMessage());
     }
 

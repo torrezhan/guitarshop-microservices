@@ -2,6 +2,7 @@ package com.example.order.order;
 
 import com.example.order.customer.CustomerClient;
 import com.example.order.exception.BusinessException;
+import com.example.order.exception.UnauthorizedAccessException;
 import com.example.order.orderline.OrderLineRequest;
 import com.example.order.orderline.OrderLineService;
 import com.example.order.payment.PaymentClient;
@@ -10,6 +11,7 @@ import com.example.order.product.ProductClient;
 import com.example.order.product.PurchaseRequest;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,15 +73,29 @@ public class OrderService {
     }
 
     public List<OrderResponse> findAllOrders() {
-        return this.repository.findAll()
+        String authenticatedEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        var customer = customerClient.findCustomerByEmail(authenticatedEmail)
+                .orElseThrow(() -> new BusinessException("Customer not found"));
+        
+        return this.repository.findByCustomerId(customer.id())
                 .stream()
                 .map(this.mapper::fromOrder)
                 .collect(Collectors.toList());
     }
 
     public OrderResponse findById(Integer id) {
-        return this.repository.findById(id)
-                .map(this.mapper::fromOrder)
+        var order = this.repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(String.format("No order found with the provided ID: %d", id)));
+        
+        // Verify ownership
+        String authenticatedEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        var customer = customerClient.findCustomerByEmail(authenticatedEmail)
+                .orElseThrow(() -> new BusinessException("Customer not found"));
+        
+        if (!order.getCustomerId().equals(customer.id())) {
+            throw new UnauthorizedAccessException("You are not authorized to access this order");
+        }
+        
+        return this.mapper.fromOrder(order);
     }
 }

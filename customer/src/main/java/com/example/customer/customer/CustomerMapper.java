@@ -11,8 +11,8 @@ public class CustomerMapper {
     }
     return Customer.builder()
         .id(request.id() != null ? Integer.parseInt(request.id()) : null)
-        .firstname(request.firstname())
-        .lastname(request.lastname())
+        .firstName(request.firstname())
+        .lastName(request.lastname())
         .email(request.email())
         .password(request.password())
         .address(request.address())
@@ -25,8 +25,8 @@ public class CustomerMapper {
     }
     return new CustomerResponse(
         customer.getId().toString(),
-        customer.getFirstname(),
-        customer.getLastname(),
+        customer.getFirstName(),
+        customer.getLastName(),
         customer.getEmail(),
         null,
         customer.getAddress()

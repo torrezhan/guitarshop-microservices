@@ -44,4 +44,17 @@ public class ProductMapper {
                 quantity
         );
     }
+
+    public void updateProductFromRequest(ProductRequest request, Product product) {
+        product.setName(request.name());
+        product.setDescription(request.description());
+        product.setAvailableQuantity(request.availableQuantity());
+        product.setPrice(request.price());
+        product.setPhoto(request.photo());
+        product.setCategory(
+                Category.builder()
+                        .id(request.categoryId())
+                        .build()
+        );
+    }
 }
