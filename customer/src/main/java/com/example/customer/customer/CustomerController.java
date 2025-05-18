@@ -19,54 +19,58 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CustomerController {
 
-  private final CustomerService service;
+  private final CustomerService customerService;
 
   @PostMapping("/register")
   public ResponseEntity<String> createCustomer(
       @RequestBody @Valid CustomerRequest request
   ) {
-    return ResponseEntity.ok(this.service.createCustomer(request));
+    return ResponseEntity.ok(this.customerService.createCustomer(request));
   }
 
-  @PutMapping
+  @PutMapping("/{customer-id}")
   public ResponseEntity<Void> updateCustomer(
+      @PathVariable("customer-id") String customerId,
       @RequestBody @Valid CustomerRequest request
   ) {
-    this.service.updateCustomer(request);
+    if (!customerId.equals(request.id())) {
+      throw new IllegalArgumentException("Customer ID in path does not match ID in request body");
+    }
+    this.customerService.updateCustomer(request);
     return ResponseEntity.accepted().build();
   }
 
   @GetMapping
   public ResponseEntity<List<CustomerResponse>> findAll() {
-    return ResponseEntity.ok(this.service.findAllCustomers());
+    return ResponseEntity.ok(this.customerService.findAllCustomers());
   }
 
   @GetMapping("/exists/{customer-id}")
   public ResponseEntity<Boolean> existsById(
       @PathVariable("customer-id") String customerId
   ) {
-    return ResponseEntity.ok(this.service.existsById(customerId));
+    return ResponseEntity.ok(this.customerService.existsById(customerId));
   }
 
   @GetMapping("/{customer-id}")
-  public ResponseEntity<CustomerResponse> findById(
+  public ResponseEntity<CustomerResponse> getCustomerById(
       @PathVariable("customer-id") String customerId
   ) {
-    return ResponseEntity.ok(this.service.findById(customerId));
+    return ResponseEntity.ok(this.customerService.findById(customerId));
   }
 
   @GetMapping("/email/{email}")
   public ResponseEntity<CustomerResponse> findByEmail(
       @PathVariable("email") String email
   ) {
-    return ResponseEntity.ok(this.service.findByEmail(email));
+    return ResponseEntity.ok(this.customerService.findByEmail(email));
   }
 
   @DeleteMapping("/{customer-id}")
-  public ResponseEntity<Void> delete(
+  public ResponseEntity<Void> deleteCustomer(
       @PathVariable("customer-id") String customerId
   ) {
-    this.service.deleteCustomer(customerId);
+    this.customerService.deleteCustomer(customerId);
     return ResponseEntity.accepted().build();
   }
 }

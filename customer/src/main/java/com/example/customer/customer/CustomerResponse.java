@@ -6,7 +6,8 @@ public record CustomerResponse(
     String lastname,
     String email,
     String password,
-    Address address
+    Address address,
+    boolean admin
 ) {
 
 }

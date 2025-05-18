@@ -16,6 +16,7 @@ public class CustomerMapper {
         .email(request.email())
         .password(request.password())
         .address(request.address())
+        .admin(request.admin() != null ? request.admin() : false)
         .build();
   }
 
@@ -29,7 +30,8 @@ public class CustomerMapper {
         customer.getLastName(),
         customer.getEmail(),
         null,
-        customer.getAddress()
+        customer.getAddress(),
+        customer.isAdmin()
     );
   }
 }

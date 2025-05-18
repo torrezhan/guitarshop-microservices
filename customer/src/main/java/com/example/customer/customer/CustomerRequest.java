@@ -14,7 +14,8 @@ public record CustomerRequest(
     String email,
     @NotNull(message = "Password is required")
     String password,
-    Address address
+    Address address,
+    Boolean admin
 ) {
 
 }

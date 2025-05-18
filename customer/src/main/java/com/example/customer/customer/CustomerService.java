@@ -38,19 +38,30 @@ public class CustomerService {
             String.format("Cannot update customer:: No customer found with the provided ID: %s", request.id())
         ));
     
-    // Verify ownership
+    // Verify ownership or admin status
     String authenticatedEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-    if (!customer.getEmail().equals(authenticatedEmail)) {
+    var authenticatedCustomer = repository.findByEmail(authenticatedEmail)
+        .orElseThrow(() -> new CustomerNotFoundException("Authenticated user not found"));
+    
+    if (!customer.getEmail().equals(authenticatedEmail) && !authenticatedCustomer.isAdmin()) {
       throw new UnauthorizedAccessException("You are not authorized to update this customer's data");
     }
     
-    mergeCustomer(customer, request);
-    this.repository.save(customer);
+    // Only allow updating own data or admin can update any data
+    if (authenticatedCustomer.isAdmin() || customer.getEmail().equals(authenticatedEmail)) {
+      mergeCustomer(customer, request);
+      this.repository.save(customer);
+    } else {
+      throw new UnauthorizedAccessException("You are not authorized to update this customer's data");
+    }
   }
 
   private void mergeCustomer(Customer customer, CustomerRequest request) {
     if (StringUtils.isNotBlank(request.firstname())) {
       customer.setFirstName(request.firstname());
+    }
+    if (StringUtils.isNotBlank(request.lastname())) {
+      customer.setLastName(request.lastname());
     }
     if (StringUtils.isNotBlank(request.email())) {
       customer.setEmail(request.email());
@@ -60,6 +71,9 @@ public class CustomerService {
     }
     if (request.address() != null) {
       customer.setAddress(request.address());
+    }
+    if (request.admin() != null) {
+      customer.setAdmin(request.admin());
     }
   }
 
@@ -100,8 +114,8 @@ public class CustomerService {
             String.format("Authenticated user with email %s not found in the database", authenticatedEmail)
         ));
     
-    // Verify ownership
-    if (!customer.getEmail().equals(authenticatedEmail)) {
+    // Verify ownership or admin status
+    if (!customer.getEmail().equals(authenticatedEmail) && !authenticatedCustomer.isAdmin()) {
       throw new UnauthorizedAccessException("You are not authorized to delete this customer's data");
     }
     

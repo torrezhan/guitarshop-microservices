@@ -10,5 +10,6 @@ public record CustomerDTO(
     String lastname,
     String email,
     String password,
-    AddressDTO address
+    AddressDTO address,
+    boolean admin
 ) {} 
