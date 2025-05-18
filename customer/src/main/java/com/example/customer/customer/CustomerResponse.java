@@ -5,6 +5,7 @@ public record CustomerResponse(
     String firstname,
     String lastname,
     String email,
+    String password,
     Address address
 ) {
 
