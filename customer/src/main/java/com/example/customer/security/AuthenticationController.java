@@ -31,4 +31,4 @@ public class AuthenticationController {
         final String jwt = jwtService.generateToken(userDetails);
         return ResponseEntity.ok(new AuthenticationResponse(jwt));
     }
-} 
+}

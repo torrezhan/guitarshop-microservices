@@ -19,5 +19,4 @@ public record ProductRequest(
         @NotNull(message = "Product category is required")
         Integer categoryId,
         String photo
-) {
-}
+) {}

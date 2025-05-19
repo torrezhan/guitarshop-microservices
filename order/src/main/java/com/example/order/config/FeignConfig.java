@@ -15,4 +15,4 @@ public class FeignConfig {
             requestTemplate.header("Authorization", "Bearer " + token);
         };
     }
-} 
+}

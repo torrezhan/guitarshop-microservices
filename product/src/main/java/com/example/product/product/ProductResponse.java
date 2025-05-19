@@ -12,5 +12,4 @@ public record ProductResponse(
         String categoryName,
         String categoryDescription,
         String photo
-) {
-}
+) {}

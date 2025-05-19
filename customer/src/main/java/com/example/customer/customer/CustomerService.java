@@ -108,7 +108,7 @@ public class CustomerService {
     // Get authenticated email from security context
     String authenticatedEmail = SecurityContextHolder.getContext().getAuthentication().getName();
     
-    // Check if authenticated user exists in our database
+    // Check if authenticated user exists in database
     var authenticatedCustomer = repository.findByEmail(authenticatedEmail)
         .orElseThrow(() -> new CustomerNotFoundException(
             String.format("Authenticated user with email %s not found in the database", authenticatedEmail)

@@ -12,4 +12,4 @@ public record CustomerDTO(
     String password,
     AddressDTO address,
     boolean admin
-) {} 
+) {}

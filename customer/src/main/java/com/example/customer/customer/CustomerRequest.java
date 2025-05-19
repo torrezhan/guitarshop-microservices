@@ -16,6 +16,4 @@ public record CustomerRequest(
     String password,
     Address address,
     Boolean admin
-) {
-
-}
+) {}

@@ -15,4 +15,4 @@ public record Customer(
         @Email(message = "The customer email is not correctly formatted")
         String email,
         boolean admin
-) { }
+) {}

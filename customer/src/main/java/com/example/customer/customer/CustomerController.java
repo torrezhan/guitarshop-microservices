@@ -5,14 +5,8 @@ import java.util.List;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/customers")
@@ -29,6 +23,7 @@ public class CustomerController {
   }
 
   @PutMapping("/{customer-id}")
+  @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
   public ResponseEntity<Void> updateCustomer(
       @PathVariable("customer-id") String customerId,
       @RequestBody @Valid CustomerRequest request
@@ -40,12 +35,8 @@ public class CustomerController {
     return ResponseEntity.accepted().build();
   }
 
-  @GetMapping
-  public ResponseEntity<List<CustomerResponse>> findAll() {
-    return ResponseEntity.ok(this.customerService.findAllCustomers());
-  }
-
   @GetMapping("/exists/{customer-id}")
+  @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
   public ResponseEntity<Boolean> existsById(
       @PathVariable("customer-id") String customerId
   ) {
@@ -53,6 +44,7 @@ public class CustomerController {
   }
 
   @GetMapping("/{customer-id}")
+  @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
   public ResponseEntity<CustomerResponse> getCustomerById(
       @PathVariable("customer-id") String customerId
   ) {
@@ -60,6 +52,7 @@ public class CustomerController {
   }
 
   @GetMapping("/email/{email}")
+  @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
   public ResponseEntity<CustomerResponse> findByEmail(
       @PathVariable("email") String email
   ) {
@@ -67,6 +60,7 @@ public class CustomerController {
   }
 
   @DeleteMapping("/{customer-id}")
+  @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
   public ResponseEntity<Void> deleteCustomer(
       @PathVariable("customer-id") String customerId
   ) {

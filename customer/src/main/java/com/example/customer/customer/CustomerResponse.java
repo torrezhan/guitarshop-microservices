@@ -8,6 +8,4 @@ public record CustomerResponse(
     String password,
     Address address,
     boolean admin
-) {
-
-}
+) {}
